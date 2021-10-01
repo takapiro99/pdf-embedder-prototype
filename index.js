@@ -1,15 +1,19 @@
 const express = require("express");
-const app = express();
 const { v4: uuidv4 } = require("uuid");
-const path = require("path")
+const path = require("path");
+const fs = require("fs");
+const { degrees, PDFDocument, rgb, StandardFonts } = require("pdf-lib");
+
+const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/", function (req, res) {
+app.get("/", (req, res) => {
   res.sendFile("index.html", { root: __dirname });
 });
-app.get("/order.pdf", function (req, res) {
+
+app.get("/order.pdf", (req, res) => {
   res.sendFile("order.pdf", { root: __dirname });
 });
 
@@ -26,21 +30,16 @@ app.get("/out/:path", (req, res) => {
   res.sendFile(req.params.path, { root: path.join(__dirname, "out") });
 });
 
-app.listen(5000, function () {
-  console.log("Example app listening on port 5000!");
+const port = 5000;
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}!`);
 });
 
-const { degrees, PDFDocument, rgb, StandardFonts } = require("pdf-lib");
-const fs = require("fs");
-// This should be a Uint8Array or ArrayBuffer
-// This data can be obtained in a number of different ways
-// If your running in a Node environment, you could use fs.readFile()
-// In the browser, you could make a fetch() call and use res.arrayBuffer()
 const existingPdfBytes = fs.readFileSync("./order.pdf");
 
 const exec = async (name, fileName = "modified.pdf") => {
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
-
   // Print all available metadata fields
   console.log("Title:", pdfDoc.getTitle());
   console.log("Author:", pdfDoc.getAuthor());
@@ -73,7 +72,7 @@ const exec = async (name, fileName = "modified.pdf") => {
     font: helveticaFont,
     color: rgb(0.1, 0.1, 0.1),
   });
-  // Serialize the PDFDocument to bytes (a Uint8Array)
+
   const pdfBytes = await pdfDoc.save();
   fs.appendFileSync(fileName, pdfBytes);
   return fileName;
