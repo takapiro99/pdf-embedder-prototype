@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja" id="html">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    hello world!
+    <div>
+      <p>
+        提出先選択
+        <!-- https://www.soumu.go.jp/main_content/000730858.xlsxからもってきたい？ -->
+        <select name="Sel-Destination-Group">
+          <option value="1">農協・JA</option>
+          <option value="2">企業</option>
+          <option value="3">市区町村</option>
+          <option value="4">農林水産省</option>
+        </select>
+        <select name="Sel-Prefecture">
+          <option value="1">北海道</option>
+          <option value="2">青森県</option>
+          <option value="25">東京都</option>
+          <option value="47">沖縄県</option>
+        </select>
+        <select name="Sel-Municipality">
+          <option value="1">札幌市</option>
+          <option value="2">石狩市</option>
+          <option value="3">小樽市</option>
+          <option value="4">江別市</option>
+        </select>
+      </p>
+      <p>
+        提出書類選択
+        <!-- https://www.soumu.go.jp/main_content/000730858.xlsxからもってきたい？ -->
+        <select name="Sel-Template-File">
+          <option value="1">出荷伝票</option>
+          <option value="2">なんかの書類</option>
+        </select>
+      </p>
+    </div>
+    <span>↓元のPDFだよ</span>
+    <p style="border: 1px solid green; height: 20vw; width: 95vw">
+      <!-- <p style="border: 1px solid green; height: 141vw; width: 95vw"> -->
+      <embed
+        src="order.pdf"
+        type="application/pdf"
+        width="100%"
+        height="100%"
+      />
+    </p>
+    <div>
+      <p>
+        <!-- <form> -->
+        <label for="name"
+          >なまえを埋め込む
+          <input type="text" name="name" id="name" placeholder="なまえ" />
+        </label>
+        <button type="button" onclick="submit()">つくる！</button>
+        <!-- </form> -->
+      </p>
+    </div>
+    <div>
+      <p
+        id="out"
+        style="border: 1px solid green; height: 141vw; width: 95vw"
+      ></p>
+    </div>
+    <script>
+      const submit = (e) => {
+        const p = document.getElementById("out");
+        p.innerText = "executing...";
+        const name = document.getElementById("name").value;
+        if (!name) {
+          alert("必須やで");
+          return;
+        }
+        axios
+          .post("/go", { name: name })
+          .then((res) => {
+            console.log(res);
+            p.innerHTML = `
+done!
+<embed
+	src="${res.data.path}"
+	type="application/pdf"
+	width="100%"
+	height="100%"
+/>`;
+          })
+          .catch((e) => console.error(e));
+        // return false
+      };
+    </script>
+  </body>
+</html>
